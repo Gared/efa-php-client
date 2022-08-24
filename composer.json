@@ -1,0 +1,32 @@
+{
+  "name": "gared/php-efa-client",
+  "type": "library",
+  "description": "PHP client for requesting EFA API",
+  "license": "MIT",
+  "keywords": [
+    "efa",
+    "client"
+  ],
+  "authors": [
+    {
+      "name": "Stefan Müller",
+      "email": "mu.stefan@googlemail.com",
+      "role": "Developer"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Gared\\EFA\\": "lib/"
+    }
+  },
+  "require": {
+    "php": ">=7.4",
+    "ext-mbstring": "*",
+    "ext-json": "*",
+    "guzzlehttp/guzzle": "^7.4",
+    "symfony/serializer": "^5.4",
+    "symfony/property-access": "^5.4",
+    "symfony/property-info": "^5.4",
+    "phpdocumentor/reflection-docblock": "^5"
+  }
+}
