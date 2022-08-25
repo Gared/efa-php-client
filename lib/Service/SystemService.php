@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Gared\EFA\Request;
+namespace Gared\EFA\Service;
 
 use Gared\EFA\Model\SystemResponse;
 use GuzzleHttp\ClientInterface;

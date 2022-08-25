@@ -5,20 +5,9 @@ namespace Gared\EFA\Model;
 
 class Trip
 {
-    /**
-     * @var string
-     */
-    private $distance;
-
-    /**
-     * @var string
-     */
-    private $duration;
-
-    /**
-     * @var string
-     */
-    private $desc;
+    private string $distance;
+    private string $duration;
+    private string $desc;
 
     /**
      * @var Leg[]

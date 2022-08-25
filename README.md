@@ -8,7 +8,7 @@ Used in cities in Germany like Augsburg, Munich or Münster.
 
 Use composer
 ```console
-composer require gared/php-efa-client
+composer require gared/efa-php-client
 ```
 
 ## Usage examples
@@ -21,12 +21,13 @@ $client = new \Gared\EFA\Client(\Gared\EFA\Client::BASE_URL_MVV);
 ```
 
 
-| Transport association       | constant     |
-|-----------------------------|--------------|
-| Münchner Verkehrs Verbund   | BASE_URL_MVV |
-| Augsburger Verkehrs Verbund | BASE_URL_AVV |
-| Verkehrsverbund Rhein-Ruhr  | BASE_URL_VRR |
-| Großraum-Verkehr Hannover   | BASE_URL_GVH |
+| Transport association         | constant      |
+|-------------------------------|---------------|
+| Münchner Verkehrs Verbund     | BASE_URL_MVV  |
+| Augsburger Verkehrs Verbund   | BASE_URL_AVV  |
+| Verkehrsverbund Rhein-Ruhr    | BASE_URL_VRR  |
+| Großraum-Verkehr Hannover     | BASE_URL_GVH  |
+| Braunschweiger Verkehrs-GmbH  | BASE_URL_BSVG |
 
 
 ### Find stations 
@@ -48,14 +49,16 @@ foreach ($response->getStopFinder()->getPoints() as $point) {
 
 ## Documentation
 
-This library using the following enpoints:
-| Endpoint               | Description |
-| ---------------------- | ---------------------------------------------------------------------------------------- |
-| XML_STOPFINDER_REQUEST | Get stations and POIs                                                                    |
-| XML_TRIP_REQUEST2      | Get (realtime) informations about transportation possibilities from one place to another |
-| XML_DM_REQUEST         | Get departure informations of a station                                                  |
-| XML_ADDINFO_REQUEST    | Get additional informations like interferences                                           |
+This library using the following endpoints:
+
+| Endpoint                 | Method name             | Description                                                                              |
+|--------------------------|-------------------------|------------------------------------------------------------------------------------------|
+| XML_STOPFINDER_REQUEST   | $client->findStations   | Get stations and POIs                                                                    |
+| XML_TRIP_REQUEST2        | $client->findTrip       | Get (realtime) informations about transportation possibilities from one place to another |
+| XML_DM_REQUEST           | $client->findDepartures | Get departure informations of a station                                                  |
+| XML_SYSTEMINFO_REQUEST   | $client->getSystem      | Get system info and version                                                              |
+| XML_ADDINFO_REQUEST      | TODO                    | Get additional informations like interferences                                           |
 
 Read more about this API here:
-* [EFA-API from muensterhack.de](https://www.muensterhack.de/themes/mshack/assets/docs/2015_EFA-API.pdf).
-* [Documentation of OpenVRR](https://www.openvrr.de/pages/api).
+* [EFA-API from muensterhack.de](https://www.muensterhack.de/themes/mshack/assets/docs/2015_EFA-API.pdf)
+* [Documentation of OpenVRR](https://www.openvrr.de/pages/api)

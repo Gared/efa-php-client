@@ -1,5 +1,5 @@
 {
-  "name": "gared/php-efa-client",
+  "name": "gared/efa-php-client",
   "type": "library",
   "description": "PHP client for requesting EFA API",
   "license": "MIT",

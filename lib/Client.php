@@ -1,12 +1,16 @@
 <?php
+declare(strict_types=1);
 
 namespace Gared\EFA;
 
 use Gared\EFA\Normalizer\PointsNormalizer;
-use Gared\EFA\Request\DepartureService;
-use Gared\EFA\Request\StationService;
-use Gared\EFA\Request\SystemService;
-use Gared\EFA\Request\TripService;
+use Gared\EFA\Request\DepartureRequest;
+use Gared\EFA\Request\StationRequest;
+use Gared\EFA\Request\TripRequest;
+use Gared\EFA\Service\DepartureService;
+use Gared\EFA\Service\StationService;
+use Gared\EFA\Service\SystemService;
+use Gared\EFA\Service\TripService;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\RequestOptions;
 use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
@@ -23,24 +27,11 @@ class Client
     public const BASE_URL_MVV = 'https://efa.mvv-muenchen.de/bcl/';
     public const BASE_URL_VRR = 'https://efa.vrr.de/vrr/';
     public const BASE_URL_GVH = 'https://efa156.efa.de/efaws2/default/';
+    public const BASE_URL_BSVG = 'https://bsvg.efa.de/bsvagstd/';
 
     private ClientInterface $httpClient;
     private SerializerInterface $serializer;
     private int $sessionId = 0;
-
-    /**
-     * @var array
-     */
-    private const DEFAULT_PARAMS = [
-        'outputFormat' => 'JSON',
-        'stateless' => 1,
-        'locationServerActive' => 1,
-        'coordOutputFormat' => 'WGS84[DD.DDDDD]',
-        'coordOutputFormatTail' => 5,
-        'sessionID' => 0,
-        'requestID' => 0,
-        'mId' => 'efa_www',
-    ];
 
     public function __construct(string $baseUrl)
     {
@@ -61,19 +52,19 @@ class Client
         $this->httpClient = $client;
     }
 
-    public function findStations(string $name): StationService
+    public function findStations(StationRequest $stationRequest): StationService
     {
-        return new StationService($this->httpClient, $this->getSerializer(), $name, 'any', self::DEFAULT_PARAMS);
+        return new StationService($this->httpClient, $this->getSerializer(), $stationRequest);
     }
 
-    public function findTrip(string $depStation, string $destStation): TripService
+    public function findTrip(TripRequest $tripRequest): TripService
     {
-        return $this->getTripService($depStation, $destStation);
+        return new TripService($this->httpClient, $this->getSerializer(), $tripRequest);
     }
 
-    public function findDepartures(string $depStation): DepartureService
+    public function findDepartures(DepartureRequest $departureRequest): DepartureService
     {
-        return $this->getDepartureService($depStation);
+        return new DepartureService($this->httpClient, $this->getSerializer(), $departureRequest);
     }
 
     public function getSystem(): SystemService
@@ -103,15 +94,5 @@ class Client
     private function getSerializer(): SerializerInterface
     {
         return $this->serializer;
-    }
-
-    protected function getTripService(string $depStation, string $destStation): TripService
-    {
-        return new TripService($this->httpClient, $this->getSerializer(), $depStation, $destStation, self::DEFAULT_PARAMS);
-    }
-
-    protected function getDepartureService(string $depStation): DepartureService
-    {
-        return new DepartureService($this->httpClient, $this->getSerializer(), $depStation, self::DEFAULT_PARAMS);
     }
 }

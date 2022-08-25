@@ -19,10 +19,7 @@ class Leg
      */
     private $stopSeq;
 
-    /**
-     * @var string|null
-     */
-    private $infos;
+    private ?array $infos;
 
     private string $format;
 
@@ -86,12 +83,12 @@ class Leg
         $this->stopSeq = $stopSeq;
     }
 
-    public function getInfos(): ?string
+    public function getInfos(): ?array
     {
         return $this->infos;
     }
 
-    public function setInfos(?string $infos): void
+    public function setInfos(?array $infos): void
     {
         $this->infos = $infos;
     }

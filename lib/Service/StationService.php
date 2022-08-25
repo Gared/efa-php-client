@@ -1,10 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Gared\EFA\Request;
+namespace Gared\EFA\Service;
 
 use Gared\EFA\Model\StopFinderResponse;
+use Gared\EFA\Request\StationRequest;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -14,27 +16,27 @@ class StationService
 
     private ClientInterface $client;
     private SerializerInterface $serializer;
-    private array $parameters;
     private ResponseInterface $response;
+    private StationRequest $stationRequest;
 
-    public function __construct(ClientInterface $client, SerializerInterface $serializer, string $name, string $type, array $parameters)
+    public function __construct(ClientInterface $client, SerializerInterface $serializer, StationRequest $stationRequest)
     {
         $this->client = $client;
         $this->serializer = $serializer;
-        $this->parameters = $parameters;
+        $this->stationRequest = $stationRequest;
 
-        $this->fetchStationsForName($name, $type);
+        $this->fetchStations();
     }
 
-    private function fetchStationsForName(string $name, string $type)
+    private function fetchStations()
     {
-        $parameters = array_merge($this->parameters, [
-            'name_sf' => $name,
-            'type_sf' => $type,
+        $parameters = array_merge($this->stationRequest->getDefaultParameters(), [
+            'name_sf' => $this->stationRequest->getName(),
+            'type_sf' => $this->stationRequest->getType(),
         ]);
 
         $this->response = $this->client->request('GET', self::STOP_FINDER_ENDPOINT, [
-            'query' => $parameters,
+            RequestOptions::QUERY => $parameters,
         ]);
     }
 

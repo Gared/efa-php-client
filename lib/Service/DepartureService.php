@@ -1,12 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace Gared\EFA\Request;
+namespace Gared\EFA\Service;
 
-use DateTime;
 use Gared\EFA\Model\DepartureResponse;
 use Gared\EFA\Model\Parameter;
+use Gared\EFA\Request\DepartureRequest;
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
@@ -28,35 +29,34 @@ class DepartureService
 
     private ClientInterface $client;
     private SerializerInterface $serializer;
-    private array $parameters;
     private ResponseInterface $response;
     private DepartureResponse $serializedResponse;
     private string $sessionId;
     private string $body;
+    private DepartureRequest $departureRequest;
 
-    public function __construct(ClientInterface $client, SerializerInterface $serializer, string $depStation, array $parameters)
+    public function __construct(ClientInterface $client, SerializerInterface $serializer, DepartureRequest $departureRequest)
     {
         $this->client = $client;
         $this->serializer = $serializer;
-        $this->parameters = $parameters;
+        $this->departureRequest = $departureRequest;
 
-        // TODO fix parameter
-        $this->fetchDepartures($depStation, new DateTime(), true);
+        $this->fetchDepartures();
     }
 
-    private function fetchDepartures(string $depStation, DateTime $dateTime, bool $isDateTimeDep): void
+    private function fetchDepartures(): void
     {
-        $parameters = array_merge($this->parameters, [
-            'name_dm' => $depStation,
+        $parameters = [
+            'name_dm' => $this->departureRequest->getDepStation(),
             'type_dm' => 'any',
             'mode' => 'direct',
-            'useRealtime' => '1',
-            'itdDateTimeDepArr' => $isDateTimeDep ? self::TYPE_DEP : self::TYPE_DEST,
-            'itdDate' => $dateTime->format('Ymd'),
-            'itdTime' => $dateTime->format('Hi'),
+            'useRealtime' => $this->departureRequest->isUseRealtime() ? '1' : '0',
+            'itdDateTimeDepArr' => $this->departureRequest->isDateTimeDep() ? self::TYPE_DEP : self::TYPE_DEST,
+            'itdDate' => $this->departureRequest->getDateTime()->format('Ymd'),
+            'itdTime' => $this->departureRequest->getDateTime()->format('Hi'),
 //            'lineRestriction' => self::LINE_RESTRICTION_ALL,
 //            'routeType' => self::ROUTE_TYPE_LEAST_TIME,
-        ]);
+        ];
 
         $this->doRequest($parameters);
 
@@ -68,11 +68,11 @@ class DepartureService
      */
     public function next(): void
     {
-        $parameters = array_merge($this->parameters, [
+        $parameters = [
             'sessionID' => $this->sessionId,
             'requestID' => '1',
             'command' => 'tripNext',
-        ]);
+        ];
 
         $this->doRequest($parameters);
     }
@@ -82,11 +82,11 @@ class DepartureService
      */
     public function previous(): void
     {
-        $parameters = array_merge($this->parameters, [
+        $parameters = [
             'sessionID' => $this->sessionId,
             'requestID' => '1',
             'command' => 'tripPrev',
-        ]);
+        ];
 
         $this->doRequest($parameters);
     }
@@ -94,7 +94,7 @@ class DepartureService
     private function doRequest(array $parameters): void
     {
         $response = $this->client->request('GET', self::DEPARTURE_MONITOR_ENDPOINT, [
-            'query' => $parameters,
+            RequestOptions::QUERY => array_merge($this->departureRequest->getDefaultParameters(), $parameters),
         ]);
         $this->convertResponse($response);
     }
